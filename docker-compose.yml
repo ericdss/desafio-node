@@ -1,0 +1,42 @@
+services:
+
+  api:
+    build:
+          context: ./
+          dockerfile: Dockerfile
+    image: ericdss/desafio-node:latest
+    restart: always
+    container_name: api
+    networks:
+      - application
+    depends_on:
+      - db
+    
+  db:
+    image: mysql:latest
+    restart: always
+    container_name: db
+    environment:
+      MYSQL_DATABASE: nodedb
+      MYSQL_ROOT_PASSWORD: root
+    ports: 
+      - 3306:3306
+    networks:
+      - application
+
+  nginx:
+    image: nginx:alpine
+    restart: always
+    container_name: nginx
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    ports: 
+      - 8080:8080
+    depends_on:
+      - api
+    networks:
+      - application
+
+networks:
+  application:
+    driver: bridge
